@@ -1,3 +1,7 @@
 import java.awt.*;
-public class Brick {
+public class Brick extends GameObject {
+    public Brick(double x, double y, int width, int height) {
+        super(x, y, width, height);
+    }
+
 }

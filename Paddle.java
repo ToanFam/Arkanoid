@@ -1,19 +1,16 @@
 import java.awt.*;
 
-public class Paddle {
-    int x, y;
+public class Paddle extends MovableObject {
+    double x, y;
     int width, height;
 
-    public Paddle(int x, int y, int width, int height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+    public Paddle(double x, double y, int width, int height) {
+        super(x, y, width, height);
     }
 
-    public void draw(Graphics g) {
-        g.setColor(Color.BLUE);
-        g.fillRect(x, y, width, height);
-    }
 
+    public void render(Graphics g2) {
+        g2.setColor(Color.BLUE);
+        g2.fillRect((int)x, (int)y, width, height);
+    }
 }
