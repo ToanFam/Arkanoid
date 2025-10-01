@@ -1,7 +1,0 @@
-package src;
-
-public class StrongBrick extends Brick {
-    public StrongBrick(double x, double y, int width, int height) {
-        super(x, y, width, height);
-    }
-}
