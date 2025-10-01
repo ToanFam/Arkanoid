@@ -1,8 +1,6 @@
 import java.awt.*;
 
 public class Paddle extends MovableObject {
-    double x, y;
-    int width, height;
 
     public Paddle(double x, double y, int width, int height) {
         super(x, y, width, height);
