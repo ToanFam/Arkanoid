@@ -1,6 +1,7 @@
+package Arkanoid.Src.entities;
 import java.awt.*;
 
-abstract class GameObject {
+public abstract class GameObject {
     protected double x, y;
     protected int width, height;
 

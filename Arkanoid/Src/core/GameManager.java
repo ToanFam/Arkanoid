@@ -1,3 +1,4 @@
+package Arkanoid.Src.core;
 import java.awt.event.KeyEvent;
 import java.awt.*;
 import java.util.ArrayList;

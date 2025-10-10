@@ -1,3 +1,4 @@
+package Arkanoid.Src.entities;
 import java.awt.*;
 
 public class Paddle extends MovableObject {
