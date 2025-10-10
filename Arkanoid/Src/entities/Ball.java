@@ -1,3 +1,4 @@
+package Arkanoid.Src.entities;
 import java.awt.*;
 import java.awt.geom.*;
 

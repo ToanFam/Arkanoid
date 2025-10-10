@@ -1,4 +1,10 @@
+package Arkanoid.Src.core;
 import javax.swing.*;
+
+import Arkanoid.Src.entities.Ball;
+import Arkanoid.Src.entities.Brick;
+import Arkanoid.Src.entities.Paddle;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -59,10 +65,10 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             }
         }
 
-        if(ball.getY() + ball.getHeight() >= paddle.getY() &&
-           ball.getX() + ball.getWidth() >= paddle.getX() &&
-           ball.getX() <= paddle.getX() + paddle.getWidth()) {
+        if(ball.getBounds().intersects(paddle.getBounds())) {
             ball.bounce();
+            // điều chỉnh vị trí của bóng để tránh việc bóng bị "dính" vào paddle
+            ball.setY(paddle.getY() - ball.getHeight());   
         }
 
 
@@ -100,9 +106,29 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             brick.render(g);
         }
 
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.BOLD, 16));
+        g.drawString("Score: " + score, 10, 20);
+
+        if (!ball.isLaunched()) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setFont(new Font("Arial", Font.ITALIC, 24));
+        g2d.setColor(new Color(0, 0, 0, 120)); // màu đen nhưng mờ (alpha 120/255)
+
+        String message = "Press SPACE to start game";
+        FontMetrics fm = g2d.getFontMetrics();
+        int textWidth = fm.stringWidth(message);
+
+        // căn giữa theo chiều ngang, đặt ở 1/3 chiều cao màn hình
+        int x = (WIDTH - textWidth) / 2;
+        int y = (int)paddle.getY() - 50;
+
+        g2d.drawString(message, x, y);
 
     }
+}
 
+    
 
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
