@@ -2,46 +2,51 @@ package Arkanoid.Src.core;
 import javax.swing.*;
 
 import Arkanoid.Src.entities.Ball;
-import Arkanoid.Src.entities.Brick;
+import Arkanoid.Src.entities.Bricks.*;
 import Arkanoid.Src.entities.Paddle;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Game extends JPanel implements KeyListener, ActionListener {
 
     private Ball ball;
     private Paddle paddle;
     private Timer timer;
-    private ArrayList<Brick> bricks;
-    private int score = 0;
+    private ArrayList<Brick> bricks = new ArrayList<>();
+    private Point score = new Point();
     
     boolean leftPressed = false;
     boolean rightPressed = false;
 
-    final int WIDTH = 700;
+    final int WIDTH = 680;
     final int HEIGHT = 500;
  
     public Game() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        setBackground(Color.WHITE);
+        setBackground(Color.BLACK);
 
         // tạo bóng và paddle
         ball = new Ball(350, 250, 20);
         paddle = new Paddle(300, 450, 120, 18);
 
-        bricks = new ArrayList<>();
-        int rows = 5;
-        int cols =10;
-        int brickWidth = 60;
-        int brickHeight = 20;
+        int rows = 7;
+        int cols = 12;
+        int brickWidth = 55;
+        int brickHeight = 25;
+        int startX = 10, startY = 10;
 
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                int x = col * brickWidth + 30;
-                int y = row * brickHeight + 50;
-                bricks.add(new Brick(x, y, brickWidth, brickHeight));
+        Random r = new Random();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int rnd = r.nextInt(100);
+                if (rnd < 10) bricks.add(new UnbreakableBrick(startX + j * brickWidth, startY + i * brickHeight, brickWidth, brickHeight));
+                else if (rnd < 30) bricks.add(new ExplosiveBrick(startX + j * brickWidth, startY + i * brickHeight, brickWidth, brickHeight));
+                else if (rnd < 45) bricks.add(new StrongBrick(startX + j * brickWidth, startY + i * brickHeight, brickWidth, brickHeight));
+                else if (rnd < 55) bricks.add(new PowerBrick(startX + j * brickWidth, startY + i * brickHeight, brickWidth, brickHeight));
+                else bricks.add(new NormalBrick(startX + j * brickWidth, startY + i * brickHeight, brickWidth, brickHeight));
             }
         }
 
@@ -71,13 +76,13 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             ball.setY(paddle.getY() - ball.getHeight());   
         }
 
-
+        // Kiểm tra va chạm với brick và ghi điểm
         for (int i = 0; i < bricks.size(); i++) {
             Brick brick = bricks.get(i);
-            if (ball.getBounds().intersects(brick.getBounds())) {
+            if (ball.getBounds().intersects(brick.getBounds()) && !brick.isDestroyed()) {
                 ball.bounce();
-                bricks.remove(i);
-                score += 100;
+                brick.takeHit();
+                if (brick.isDestroyed()) score.updatePoint();
                 break;
             }
         }
@@ -98,32 +103,41 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
 
         // vẽ paddle và ball
-        ball.render(g);
-        paddle.render(g);
+        ball.render(g2);
+        paddle.render(g2);
+
+        // vẽ gạch
         for (Brick brick : bricks) {
-            brick.render(g);
+            if (brick.isDestroyed() && brick instanceof ExplosiveBrick) {
+                brick.onDestroyed(bricks, score);
+                if (((ExplosiveBrick) brick).hasExplosionEnded()) {
+                    brick.render(g2);
+                }
+            }
+            if (!brick.isDestroyed()) {
+                brick.render(g2);
+            }
         }
 
-        g.setColor(Color.BLACK);
-        g.setFont(new Font("Arial", Font.BOLD, 16));
-        g.drawString("Score: " + score, 10, 20);
+        // Hiển thị điểm
+        score.render(g2);
 
         if (!ball.isLaunched()) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setFont(new Font("Arial", Font.ITALIC, 24));
-        g2d.setColor(new Color(0, 0, 0, 120)); // màu đen nhưng mờ (alpha 120/255)
+        g2.setFont(new Font("Arial", Font.ITALIC, 24));
+        g2.setColor(new Color(0, 0, 0, 120)); // màu đen nhưng mờ (alpha 120/255)
 
         String message = "Press SPACE to start game";
-        FontMetrics fm = g2d.getFontMetrics();
+        FontMetrics fm = g2.getFontMetrics();
         int textWidth = fm.stringWidth(message);
 
         // căn giữa theo chiều ngang, đặt ở 1/3 chiều cao màn hình
         int x = (WIDTH - textWidth) / 2;
         int y = (int)paddle.getY() - 50;
 
-        g2d.drawString(message, x, y);
+        g2.drawString(message, x, y);
 
     }
 }
