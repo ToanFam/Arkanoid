@@ -12,8 +12,8 @@ public class Ball extends MovableObject {
 
     public void launch() {
         if(!Launched) {
-            dx = 2;
-            dy = -2;
+            dx = 5;
+            dy = -5;
             Launched = true;
         }
     }
@@ -28,8 +28,8 @@ public class Ball extends MovableObject {
 
     public Ball(double x, double y, int size) {
         super(x, y, size, size);
-        this.dx = 2;
-        this.dy = -2;
+        this.dx = 5;
+        this.dy = -5;
     }
     public void move(int screenWidth, int screenHeight) {
         x += dx;
