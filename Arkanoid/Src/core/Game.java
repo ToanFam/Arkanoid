@@ -3,20 +3,24 @@ import javax.swing.*;
 
 import Arkanoid.Src.entities.Ball;
 import Arkanoid.Src.entities.Bricks.*;
+import Arkanoid.Src.powerups.PowerUp;
 import Arkanoid.Src.entities.Paddle;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 public class Game extends JPanel implements KeyListener, ActionListener {
 
-    private Ball ball;
+    private ArrayList<Ball> balls = new ArrayList<>();
     private Paddle paddle;
     private Timer timer;
     private ArrayList<Brick> bricks = new ArrayList<>();
     private Point score = new Point();
+    private ArrayList<PowerUp> powerUps = new ArrayList<>();
     
     boolean leftPressed = false;
     boolean rightPressed = false;
@@ -29,7 +33,8 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         setBackground(Color.BLACK);
 
         // tạo bóng và paddle
-        ball = new Ball(350, 250, 20);
+        Ball ball1 = new Ball(350, 250, 20);
+        balls.add(ball1);
         paddle = new Paddle(300, 450, 120, 18);
 
         int rows = 7;
@@ -59,16 +64,19 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
     public void actionPerformed(ActionEvent e) {
 
+        Iterator<Ball> it = balls.iterator();
+        while(it.hasNext()) {
+        Ball ball = it.next();
         if(!ball.isLaunched()) {
             ball.reset(paddle);
-        }
-        else {
+        } else{
             ball.move(WIDTH, HEIGHT);
 
-            if (ball.getY() > HEIGHT) {
-                ball.reset(paddle);
-            }
-        }
+            if(ball.getY() > HEIGHT) {
+                it.remove();
+                continue;
+                }
+             }
 
         if(ball.getBounds().intersects(paddle.getBounds())) {
             ball.bounce();
@@ -77,15 +85,43 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         }
 
         // Kiểm tra va chạm với brick và ghi điểm
-        for (int i = 0; i < bricks.size(); i++) {
-            Brick brick = bricks.get(i);
+        for (int j = 0; j < bricks.size(); j++) {
+            Brick brick = bricks.get(j);
             if (ball.getBounds().intersects(brick.getBounds()) && !brick.isDestroyed()) {
                 ball.bounce();
                 brick.takeHit();
-                if (brick.isDestroyed()) score.updatePoint();
+                if (brick.isDestroyed()) {
+                      score.updatePoint();
+                      if(Math.random() < 0.2) {
+                        powerUps.add(PowerUp.randomPowerUp(brick.getCenterX(),brick.getCenterY()));
+                      }
+                }
                 break;
             }
         }
+    }
+
+    if(balls.isEmpty()) {
+        Ball newBall = new Ball(paddle.getX() + paddle.getWidth() / 2 - 10, paddle.getY() - 20, 20);
+        balls.add(newBall);
+    }
+
+    for (int i = 0; i < powerUps.size(); i++) {
+        PowerUp p = powerUps.get(i);
+        p.move();
+
+        if(p.getBounds().intersects(paddle.getBounds())) {
+            activatePowerUp(p);
+            powerUps.remove(i);
+            i--;
+            continue;
+        }
+
+        if(p.getY() > HEIGHT) {
+            powerUps.remove(i);
+            i--;
+        }
+    }
 
         if (leftPressed) {
             paddle.moveLeft();
@@ -106,7 +142,9 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         Graphics2D g2 = (Graphics2D) g;
 
         // vẽ paddle và ball
-        ball.render(g2);
+        for (Ball ball : balls) {
+            ball.render(g2);
+        }
         paddle.render(g2);
 
         // vẽ gạch
@@ -125,6 +163,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         // Hiển thị điểm
         score.render(g2);
 
+        for(Ball ball : balls) {
         if (!ball.isLaunched()) {
         g2.setFont(new Font("Arial", Font.ITALIC, 24));
         g2.setColor(new Color(0, 0, 0, 120)); // màu đen nhưng mờ (alpha 120/255)
@@ -138,9 +177,39 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         int y = (int)paddle.getY() - 50;
 
         g2.drawString(message, x, y);
-
+        }
     }
-}
+
+        for (PowerUp p : powerUps) {
+                p.render(g2);
+            }
+    }
+
+
+    private void activatePowerUp(PowerUp p) {
+        switch (p.getType()) {
+            case WIDEPADDLE:
+                paddle.setWidth(paddle.getWidth() + 40);
+                break;
+            case SLOWBALL:
+            for(Ball ball : balls) {
+                ball.setdx(ball.getdx() * 0.8);
+                ball.setdy(ball.getdy() * 0.8);
+            }
+                break;
+            case MULTIBALL:
+            ArrayList<Ball> newBalls = new ArrayList<>();
+            for(Ball ball : balls) {
+                Ball newBall = new Ball(ball.getX(), ball.getY(), ball.getWidth());
+                newBall.launch();
+                newBall.setdx(-ball.getdx());
+                newBall.setdy(-ball.getdy());
+                newBalls.add(newBall);
+            }
+            balls.addAll(newBalls);
+                break;
+        }
+    }
 
     
 
@@ -152,7 +221,9 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         }
 
         if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-            ball.launch();
+            for(Ball ball : balls) {
+                ball.launch();
+            }
         }
     repaint();
 }

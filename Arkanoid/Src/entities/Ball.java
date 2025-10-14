@@ -12,8 +12,8 @@ public class Ball extends MovableObject {
 
     public void launch() {
         if(!Launched) {
-            dx = 5;
-            dy = -5;
+            dx = 3;
+            dy = -3;
             Launched = true;
         }
     }
@@ -28,8 +28,8 @@ public class Ball extends MovableObject {
 
     public Ball(double x, double y, int size) {
         super(x, y, size, size);
-        this.dx = 5;
-        this.dy = -5;
+        this.dx = 3;
+        this.dy = -3;
     }
     public void move(int screenWidth, int screenHeight) {
         x += dx;
@@ -72,6 +72,24 @@ public class Ball extends MovableObject {
     public double getX() {
         return x;
     }
+
+    public void setdx(double dx) {
+        this.dx = dx;
+    }
+
+    public void setdy(double dy) {
+        this.dy = dy;
+    }
+
+    public int getdy() {
+        return (int)dy;
+    }
+
+    public int getdx() {
+        return (int)dx;
+    }
+    
+
 
     public void render(Graphics g) {
         g.setColor(Color.RED);
