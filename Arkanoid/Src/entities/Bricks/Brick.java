@@ -1,5 +1,6 @@
 package Arkanoid.Src.entities.Bricks;
 
+import Arkanoid.Src.core.GameManager;
 import Arkanoid.Src.entities.GameObject;
 import Arkanoid.Src.core.Point;
 import java.awt.*;
@@ -26,9 +27,14 @@ public abstract class Brick extends GameObject {
 
     public void takeHit() {
         hitPoints--;
+        playHitSound();
         if (hitPoints <= 0) {
             status = true;
         }
+    }
+
+    private void playHitSound() {
+        GameManager.playSound(type.soundPath);
     }
 
     public boolean isDestroyed() {
