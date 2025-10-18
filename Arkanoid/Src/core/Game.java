@@ -73,17 +73,16 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         if(ball.getBounds().intersects(paddle.getBounds())) {
             ball.bounce();
             // điều chỉnh vị trí của bóng để tránh việc bóng bị "dính" vào paddle
-            ball.setY(paddle.getY() - ball.getHeight());   
+            ball.setY(paddle.getY() - ball.getRadius() - 5);
         }
 
         // Kiểm tra va chạm với brick và ghi điểm
-        for (int i = 0; i < bricks.size(); i++) {
-            Brick brick = bricks.get(i);
-            if (ball.getBounds().intersects(brick.getBounds()) && !brick.isDestroyed()) {
-                ball.bounce();
-                brick.takeHit();
-                if (brick.isDestroyed()) score.updatePoint();
-                break;
+        if (!bricks.isEmpty()) {
+            for (Brick brick : bricks) {
+                if (!brick.isDestroyed()) {
+                    ball.handleCollision(brick);
+                    if (brick.isDestroyed()) score.updatePoint();
+                }
             }
         }
 
@@ -127,7 +126,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
         if (!ball.isLaunched()) {
         g2.setFont(new Font("Arial", Font.ITALIC, 24));
-        g2.setColor(new Color(0, 0, 0, 120)); // màu đen nhưng mờ (alpha 120/255)
+        g2.setColor(Color.orange);
 
         String message = "Press SPACE to start game";
         FontMetrics fm = g2.getFontMetrics();
@@ -135,12 +134,12 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
         // căn giữa theo chiều ngang, đặt ở 1/3 chiều cao màn hình
         int x = (WIDTH - textWidth) / 2;
-        int y = (int)paddle.getY() - 50;
+        int y = (int)paddle.getY() + 45;
 
         g2.drawString(message, x, y);
 
+        }
     }
-}
 
     
 
