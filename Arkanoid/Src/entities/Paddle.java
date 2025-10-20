@@ -40,6 +40,9 @@ public class Paddle extends MovableObject {
         return y;
     }
 
+    public void setWidth(int newWidth) {
+        this.width = newWidth;
+    }
 
     public void render(Graphics g2) {
         g2.setColor(Color.BLUE);
