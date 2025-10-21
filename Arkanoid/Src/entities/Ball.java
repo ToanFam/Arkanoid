@@ -54,11 +54,7 @@ public class Ball extends MovableObject {
     }
 
     public void bounce() {
-        dy = -dy; 
-        if (Math.abs(dy) < 2) {
-            dy = dy < 0 ? -2 : 2;
-        }
-            // Đổi hướng khi chạm vào paddle
+        dy = -dy;
     }
 
     // lấy tọa độ điểm thuộc Rect gần Ball nhất

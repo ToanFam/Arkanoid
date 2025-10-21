@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
-import java.lang.reflect.*;
 import java.util.Iterator;
 
 public class Game extends JPanel implements KeyListener, ActionListener {
@@ -58,15 +57,6 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         setFocusable(true);
         addKeyListener(this);
 
-        try {
-        Ball warmupBall = new Ball(10, 10, 10);
-        NormalBrick warmupBrick = new NormalBrick(0, 0, 10, 10);
-        warmupBall.handleCollision(warmupBrick); 
-
-        PowerUp.randomPowerUp(0, 0, 1, 1); 
-        } catch (Exception ex) {
-        
-        }
 
         timer = new Timer(10, this);
         timer.start();
