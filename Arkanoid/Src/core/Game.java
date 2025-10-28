@@ -17,6 +17,9 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     private ArrayList<Ball> balls = new ArrayList<>();
     private Paddle paddle;
     private Timer timer;
+    private Level currentLevel;
+    private boolean levelCleared = false;
+    private int levelClearCounter = 0;
     private ArrayList<Brick> bricks = new ArrayList<>();
     private Point score = new Point();
     private ArrayList<PowerUp> powerUps = new ArrayList<>();
@@ -36,23 +39,8 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         balls.add(ball);
         paddle = new Paddle(300, 450, 120, 18);
 
-        int rows = 7;
-        int cols = 12;
-        int brickWidth = 55;
-        int brickHeight = 25;
-        int startX = 10, startY = 10;
-
-        Random r = new Random();
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                int rnd = r.nextInt(100);
-                if (rnd < 10) bricks.add(new UnbreakableBrick(startX + j * brickWidth, startY + i * brickHeight, brickWidth, brickHeight));
-                else if (rnd < 30) bricks.add(new ExplosiveBrick(startX + j * brickWidth, startY + i * brickHeight, brickWidth, brickHeight));
-                else if (rnd < 45) bricks.add(new StrongBrick(startX + j * brickWidth, startY + i * brickHeight, brickWidth, brickHeight));
-                else if (rnd < 55) bricks.add(new PowerBrick(startX + j * brickWidth, startY + i * brickHeight, brickWidth, brickHeight));
-                else bricks.add(new NormalBrick(startX + j * brickWidth, startY + i * brickHeight, brickWidth, brickHeight));
-            }
-        }
+        currentLevel = new Level(GameManager.getCurrentLevel());
+        bricks = currentLevel.getBricks();
 
         setFocusable(true);
         addKeyListener(this);
@@ -60,7 +48,36 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
         timer = new Timer(10, this);
         timer.start();
+    }
+
+    private void loadLevel(String path) {
+        bricks.clear();
+        currentLevel = new Level(path);
+        bricks = currentLevel.getBricks();
+    }
+
+    private void checkLevelComplete() {
+        // Chuyển level
+        if (bricks.isEmpty() || levelCleared) {
+            levelClearCounter++;
+            if (levelClearCounter >= 20) {
+                levelCleared = false;
+                levelClearCounter = 0;
+                String next = GameManager.getNextLevel();
+                if (next != null) {
+                    JOptionPane.showMessageDialog(this, "Level Completed! Loading next...");
+                    loadLevel(next);
+                } else {
+                    JOptionPane.showMessageDialog(this, "🎉 You Win! All levels cleared!");
+                    GameManager.reset();
+                    loadLevel(GameManager.getCurrentLevel());
+                }
+                balls.clear();
+                balls.add(new Ball(350, 250, 15));
+                paddle = new Paddle(300, 450, 120, 18);
+            }
         }
+    }
 
     public void actionPerformed(ActionEvent e) {
 
@@ -79,53 +96,53 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             }
     
 
-        if(ball.getBounds().intersects(paddle.getBounds())) {
-            ball.bounce();
-            // điều chỉnh vị trí của bóng để tránh việc bóng bị "dính" vào paddle
-            ball.setY(paddle.getY() - ball.getRadius() - 5);
-        }
+            if(ball.getBounds().intersects(paddle.getBounds())) {
+                ball.bounce();
+                // điều chỉnh vị trí của bóng để tránh việc bóng bị "dính" vào paddle
+                ball.setY(paddle.getY() - ball.getRadius() - 5);
+            }
 
-        
 
-        // Kiểm tra va chạm với brick và ghi điểm
-        if (!bricks.isEmpty()) {
-            for (Brick brick : bricks) {
-                if (!brick.isDestroyed()) {
-                    ball.handleCollision(brick);
-                    if (brick.isDestroyed()) {
-                        score.updatePoint();
 
-                        if(Math.random() < 0.3){
-                            powerUps.add(PowerUp.randomPowerUp(brick.getCenterX(), brick.getCenterY(), 20, 20));
+            // Kiểm tra va chạm với brick và ghi điểm
+            if (!bricks.isEmpty()) {
+                for (Brick brick : bricks) {
+                    if (!brick.isDestroyed()) {
+                        ball.handleCollision(brick);
+                        if (brick.isDestroyed()) {
+                            score.updatePoint();
+
+                            if(Math.random() < 0.3){
+                                powerUps.add(PowerUp.randomPowerUp(brick.getCenterX(), brick.getCenterY(), 20, 20));
+                            }
+                            break;
                         }
-                        break;
+                    }
                 }
             }
         }
-    }
-}
 
-         for (int i = 0; i < powerUps.size(); i++) {
-        PowerUp p = powerUps.get(i);
-        p.move();
+        for (int i = 0; i < powerUps.size(); i++) {
+            PowerUp p = powerUps.get(i);
+            p.move();
 
-        if(p.getBounds().intersects(paddle.getBounds())) {
-            activatePowerUp(p);
-            powerUps.remove(i);
-            i--;
-            continue;
+            if(p.getBounds().intersects(paddle.getBounds())) {
+                activatePowerUp(p);
+                powerUps.remove(i);
+                i--;
+                continue;
+            }
+
+            if(p.getY() > HEIGHT) {
+                powerUps.remove(i);
+                i--;
+            }
         }
 
-        if(p.getY() > HEIGHT) {
-            powerUps.remove(i);
-            i--;
+        if (balls.isEmpty()) {
+            Ball newBall = new Ball(paddle.getX() + paddle.getWidth() / 2 - 10, paddle.getY() - 20, 15);
+            balls.add(newBall);
         }
-    }
-
-    if (balls.isEmpty()) {
-        Ball newBall = new Ball(paddle.getX() + paddle.getWidth() / 2 - 10, paddle.getY() - 20, 15);
-        balls.add(newBall);
-    }
 
         if (leftPressed) {
             paddle.moveLeft();
@@ -136,6 +153,15 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             paddle.moveRight();
             paddle.update(WIDTH);
         }
+
+        levelCleared = true;
+        for (Brick brick : bricks) {
+            if (!brick.isDestroyed() && !(brick instanceof UnbreakableBrick)) {
+                levelCleared = false;
+            }
+        }
+
+        checkLevelComplete();
 
         repaint();
     }
@@ -227,9 +253,12 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             for (Ball ball : balls) {
             ball.launch();
             }
+        }
+        if(e.getKeyCode() == KeyEvent.VK_N) {
+            bricks.clear();
+        }
+        repaint();
     }
-    repaint();
-}
 
     @Override 
     public void keyReleased(KeyEvent e) {

@@ -9,6 +9,31 @@ import java.util.Iterator;
 import java.util.List;
 
 public class GameManager {
+    private static List<String> levelFiles = new ArrayList<>();
+    private static int currentLevelIndex = 0;
+
+    static {
+        // Danh sách file JSON level
+        levelFiles.add("Arkanoid/Src/assets/levels/level1.json");
+        levelFiles.add("Arkanoid/Src/assets/levels/level2.json");
+        levelFiles.add("Arkanoid/Src/assets/levels/level3.json");
+    }
+
+    public static String getCurrentLevel() {
+        return levelFiles.get(currentLevelIndex);
+    }
+
+    public static String getNextLevel() {
+        currentLevelIndex++;
+        if (currentLevelIndex < levelFiles.size()) {
+            return levelFiles.get(currentLevelIndex);
+        }
+        return null; // Không còn level nào
+    }
+
+    public static void reset() {
+        currentLevelIndex = 0;
+    }
 
     // âm thanh
     public static void playSound(String filePath) {
