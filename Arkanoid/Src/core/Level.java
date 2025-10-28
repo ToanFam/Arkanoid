@@ -25,7 +25,7 @@ public class Level {
 
             int brickWidth = 55;
             int brickHeight = 25;
-            int startX = 10, startY = 10;
+            int startX = 10, startY = 50;
 
             for (int row = 0; row < data.rows; row++) {
                 String line = data.layout[row];

@@ -5,11 +5,11 @@ import Arkanoid.Src.entities.Ball;
 import Arkanoid.Src.entities.Bricks.*;
 import Arkanoid.Src.entities.Paddle;
 import Arkanoid.Src.powerups.PowerUp;
+import Arkanoid.Src.powerups.PowerUpType;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Iterator;
 
 public class Game extends JPanel implements KeyListener, ActionListener {
@@ -23,6 +23,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     private ArrayList<Brick> bricks = new ArrayList<>();
     private Point score = new Point();
     private ArrayList<PowerUp> powerUps = new ArrayList<>();
+    private final int INITIAL_LIVES = 3;
     
     boolean leftPressed = false;
     boolean rightPressed = false;
@@ -34,8 +35,11 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.BLACK);
 
+        //load hình ảnh cho power-up để không bi lag khi lần đầu xuất hiện
+        PowerUpType.preloadImages();
+
         // tạo bóng và paddle`
-        Ball ball = new Ball(350, 250, 15);
+        Ball ball = new Ball(350, 250, 20);
         balls.add(ball);
         paddle = new Paddle(300, 450, 120, 18);
 
@@ -44,7 +48,6 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
         setFocusable(true);
         addKeyListener(this);
-
 
         timer = new Timer(10, this);
         timer.start();
@@ -73,7 +76,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                     loadLevel(GameManager.getCurrentLevel());
                 }
                 balls.clear();
-                balls.add(new Ball(350, 250, 15));
+                balls.add(new Ball(350, 250, 20));
                 paddle = new Paddle(300, 450, 120, 18);
             }
         }
@@ -95,14 +98,9 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 }
             }
     
-
             if(ball.getBounds().intersects(paddle.getBounds())) {
-                ball.bounce();
-                // điều chỉnh vị trí của bóng để tránh việc bóng bị "dính" vào paddle
-                ball.setY(paddle.getY() - ball.getRadius() - 5);
+                ball.bounceOnPaddle(paddle);
             }
-
-
 
             // Kiểm tra va chạm với brick và ghi điểm
             if (!bricks.isEmpty()) {
@@ -113,7 +111,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                             score.updatePoint();
 
                             if(Math.random() < 0.3){
-                                powerUps.add(PowerUp.randomPowerUp(brick.getCenterX(), brick.getCenterY(), 20, 20));
+                                powerUps.add(PowerUp.randomPowerUp(brick.getCenterX(), brick.getCenterY(), 32, 32));
                             }
                             break;
                         }
@@ -140,7 +138,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         }
 
         if (balls.isEmpty()) {
-            Ball newBall = new Ball(paddle.getX() + paddle.getWidth() / 2 - 10, paddle.getY() - 20, 15);
+            Ball newBall = new Ball(paddle.getX() + paddle.getWidth() / 2 - 10, paddle.getY() - 20, 20);
             balls.add(newBall);
         }
 
@@ -165,7 +163,6 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
         repaint();
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -237,6 +234,14 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             newBall.setdy(-ball2.getdy());
             balls.add(newBall);
             break;
+            case LASER:
+                break;
+            case SHIELD:
+                break;
+            case STICKYPADDLE:
+                break;
+            case LIFELOSS:
+                break;
         }
     }
     

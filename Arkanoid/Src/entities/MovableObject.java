@@ -1,5 +1,4 @@
 package Arkanoid.Src.entities;
-import java.awt.*;
 public class MovableObject extends GameObject {
     protected double dx, dy;
 
