@@ -5,16 +5,16 @@ import Arkanoid.Src.entities.Ball;
 import Arkanoid.Src.entities.Bricks.*;
 import Arkanoid.Src.powerups.PowerUp;
 import Arkanoid.Src.entities.Paddle;
-import Arkanoid.Src.powerups.PowerUp;
 import Arkanoid.Src.powerups.PowerUpType;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
-public class Game extends JPanel implements KeyListener, ActionListener {
+public class Game extends JPanel implements KeyListener, ActionListener, ComponentListener {
 
     private ArrayList<Ball> balls = new ArrayList<>();
     private Paddle paddle;
@@ -25,13 +25,12 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     private ArrayList<Brick> bricks = new ArrayList<>();
     private Point score = new Point();
     private ArrayList<PowerUp> powerUps = new ArrayList<>();
-    private final int INITIAL_LIVES = 3;
     
     boolean leftPressed = false;
     boolean rightPressed = false;
 
-    final int WIDTH = 680;
-    final int HEIGHT = 500;
+    public static final int WIDTH = 680;
+    public static final int HEIGHT = 500;
  
     public Game() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -48,12 +47,28 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         currentLevel = new Level(GameManager.getCurrentLevel());
         bricks = currentLevel.getBricks();
 
-        setFocusable(true);
-        addKeyListener(this);
-
         timer = new Timer(10, this);
+
+        addComponentListener(this);
+    }
+
+    public void componentShown(ComponentEvent e) {
+        setFocusable(true);
+        removeKeyListener(this);
+        addKeyListener(this);
+        requestFocusInWindow();
         timer.start();
     }
+
+    public void componentHidden(ComponentEvent e) {
+        timer.stop();
+        removeKeyListener(this);
+    }
+
+    public void componentMoved(ComponentEvent e) {}
+    public void componentResized(ComponentEvent e) {}
+
+
 
     private void loadLevel(String path) {
         bricks.clear();
@@ -278,17 +293,6 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     @Override 
     public void keyTyped(KeyEvent e) { }
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Arkanoid");
-        Game game = new Game();
-
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(false);
-        frame.add(game);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
 }
 
     
