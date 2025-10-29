@@ -13,9 +13,13 @@ public class Point {
         totalScore += 100;
     }
 
+    public void reset() {
+        totalScore = 0;
+    }
+
     public void render(Graphics2D g2) {
         g2.setColor(Color.GREEN);
         g2.setFont(new Font("Arial", Font.BOLD, 16));
-        g2.drawString("Score: " + totalScore, 10, 480);
+        g2.drawString("Score: " + totalScore, 10, 20);
     }
 }

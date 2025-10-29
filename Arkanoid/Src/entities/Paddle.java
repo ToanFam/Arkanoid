@@ -40,13 +40,25 @@ public class Paddle extends MovableObject {
         return y;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
+    public void setWidth(int newWidth) {
+        this.width = newWidth;
     }
 
-
     public void render(Graphics g2) {
-        g2.setColor(Color.BLUE);
-        g2.fillRect((int)x, (int)y, width, height);
+        Graphics2D g2d = (Graphics2D) g2;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Color baseColor = Color.BLUE;
+        GradientPaint gp = new GradientPaint(
+            (int)x, (int)y, baseColor.brighter(), 
+            (int)x, (int)(y + height), baseColor.darker()
+        );
+        g2d.setPaint(gp);
+
+        int arcSize = 15;
+        g2d.fillRoundRect((int)x, (int)y, width, height, arcSize, arcSize);
+
+        g2d.setColor(baseColor.darker().darker());
+        g2d.setStroke(new BasicStroke(2));
+        g2d.drawRoundRect((int)x, (int)y, width, height, arcSize, arcSize);
     }
 }
