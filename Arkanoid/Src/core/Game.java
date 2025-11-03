@@ -11,19 +11,27 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.io.File;
+import javax.imageio.ImageIO;
 
 public class Game extends JPanel implements KeyListener, ActionListener {
 
     private ArrayList<Ball> balls = new ArrayList<>();
     private Paddle paddle;
+    private ArrayList<Brick> bricks = new ArrayList<>();
+
     private Timer timer;
     private Level currentLevel;
     private boolean levelCleared = false;
     private int levelClearCounter = 0;
-    private ArrayList<Brick> bricks = new ArrayList<>();
+    private int currentLevelNumber;
+
     private Point score = new Point();
     private ArrayList<PowerUp> powerUps = new ArrayList<>();
-    private final int INITIAL_LIVES = 3;
+    private int lives;
+
+    private enum GameState { PLAYING, LEVEL_CLEAR, GAME_WIN, GAME_OVER }
+    private GameState currentState;
     
     boolean leftPressed = false;
     boolean rightPressed = false;
@@ -35,6 +43,9 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.BLACK);
 
+        lives = 3;
+        currentState = GameState.PLAYING;
+
         //load hình ảnh cho power-up để không bi lag khi lần đầu xuất hiện
         PowerUpType.preloadImages();
 
@@ -44,6 +55,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         paddle = new Paddle(300, 450, 120, 18);
 
         currentLevel = new Level(GameManager.getCurrentLevel());
+        currentLevelNumber = GameManager.getCurrentLevelNumber();
         bricks = currentLevel.getBricks();
 
         setFocusable(true);
@@ -57,6 +69,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         bricks.clear();
         currentLevel = new Level(path);
         bricks = currentLevel.getBricks();
+        currentLevelNumber = GameManager.getCurrentLevelNumber();
     }
 
     private void checkLevelComplete() {
@@ -68,57 +81,55 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 levelClearCounter = 0;
                 String next = GameManager.getNextLevel();
                 if (next != null) {
-                    JOptionPane.showMessageDialog(this, "Level Completed! Loading next...");
+                    currentState = GameState.LEVEL_CLEAR;
                     loadLevel(next);
                 } else {
-                    JOptionPane.showMessageDialog(this, "🎉 You Win! All levels cleared!");
+                    currentState = GameState.GAME_WIN;
                     GameManager.reset();
                     loadLevel(GameManager.getCurrentLevel());
                 }
-                balls.clear();
-                balls.add(new Ball(350, 250, 20));
-                paddle = new Paddle(300, 450, 120, 18);
             }
         }
     }
 
     public void actionPerformed(ActionEvent e) {
 
-        Iterator<Ball> ballIterator = balls.iterator();
-        while (ballIterator.hasNext()) {
-            Ball ball = ballIterator.next();
-            if(!ball.isLaunched()) {
-                ball.reset(paddle);
-            } else {
-                ball.move(WIDTH, HEIGHT);
+        if(currentState == GameState.PLAYING) {
+            Iterator<Ball> ballIterator = balls.iterator();
+            while (ballIterator.hasNext()) {
+                Ball ball = ballIterator.next();
+                if(!ball.isLaunched()) {
+                    ball.reset(paddle);
+                } else {
+                    ball.move(WIDTH, HEIGHT);
 
-                if (ball.getY() > HEIGHT) {
-                    ballIterator.remove();
-                    continue;
+                    if (ball.getY() > HEIGHT) {
+                        ballIterator.remove();
+                        continue;
+                    }
                 }
-            }
-    
-            if(ball.getBounds().intersects(paddle.getBounds())) {
-                ball.bounceOnPaddle(paddle);
-            }
+        
+                if(ball.getBounds().intersects(paddle.getBounds())) {
+                    ball.bounceOnPaddle(paddle);
+                }
 
-            // Kiểm tra va chạm với brick và ghi điểm
-            if (!bricks.isEmpty()) {
-                for (Brick brick : bricks) {
-                    if (!brick.isDestroyed()) {
-                        ball.handleCollision(brick);
-                        if (brick.isDestroyed()) {
-                            score.updatePoint();
+                // Kiểm tra va chạm với brick và ghi điểm
+                if (!bricks.isEmpty()) {
+                    for (Brick brick : bricks) {
+                        if (!brick.isDestroyed()) {
+                            ball.handleCollision(brick);
+                            if (brick.isDestroyed()) {
+                                score.updatePoint();
 
-                            if(Math.random() < 0.3){
-                                powerUps.add(PowerUp.randomPowerUp(brick.getCenterX(), brick.getCenterY(), 32, 32));
+                                if(Math.random() < 0.3){
+                                    powerUps.add(PowerUp.randomPowerUp(brick.getCenterX(), brick.getCenterY(), 32, 32));
+                                }
+                                break;
                             }
-                            break;
                         }
                     }
                 }
             }
-        }
 
         for (int i = 0; i < powerUps.size(); i++) {
             PowerUp p = powerUps.get(i);
@@ -138,8 +149,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         }
 
         if (balls.isEmpty()) {
-            Ball newBall = new Ball(paddle.getX() + paddle.getWidth() / 2 - 10, paddle.getY() - 20, 20);
-            balls.add(newBall);
+            loseLife();
         }
 
         if (leftPressed) {
@@ -160,6 +170,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         }
 
         checkLevelComplete();
+    }
 
         repaint();
     }
@@ -195,6 +206,12 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         // Hiển thị điểm
         score.render(g2);
 
+        //hiển thị số mạng người chơi
+        g2.setFont(new Font("Arial", Font.BOLD, 20));
+        g2.setColor(Color.RED);
+        g2.drawString("Lives: " + lives, WIDTH - 100, 30);
+
+        //Vẽ chữ nhấn SPACE để bắt đầu game
         for (Ball ball : balls) {
             if (!ball.isLaunched()) {
             g2.setFont(new Font("Arial", Font.ITALIC, 24));
@@ -204,13 +221,64 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             FontMetrics fm = g2.getFontMetrics();
             int textWidth = fm.stringWidth(message);
 
-        // căn giữa theo chiều ngang, đặt ở 1/3 chiều cao màn hình
+            // căn giữa theo chiều ngang, đặt ở 1/3 chiều cao màn hình
             int x = (WIDTH - textWidth) / 2;
             int y = (int)paddle.getY() + 45;
 
             g2.drawString(message, x, y);
             }
+        }
 
+        // Vẽ level hiện tại
+        g2.setFont(new Font("Arial", Font.BOLD, 20));
+        g2.setColor(Color.WHITE);
+        String levelText = "Level: " + currentLevelNumber;
+        FontMetrics fm = g2.getFontMetrics();
+        int textWidth = fm.stringWidth(levelText);
+        g2.drawString(levelText, (WIDTH - textWidth) / 2, 30);
+
+
+        // VẼ lại JOptionPane thông báo
+        if(currentState != GameState.PLAYING && currentState != null) {
+            g2.setColor(new Color(0, 0, 0, 150));
+            g2.fillRect(0, 0, WIDTH, HEIGHT);
+
+            String title = "";
+            String subtitle = "Press ENTER to continue";
+
+            if (currentState == GameState.LEVEL_CLEAR) {
+                title = "LEVEL COMPLETE!";
+                g2.setColor(Color.GREEN);
+            } else if (currentState == GameState.GAME_WIN) {
+                title = "YOU WIN!";
+                g2.setColor(Color.YELLOW);
+            } else if (currentState == GameState.GAME_OVER) {
+                title = "GAME OVER";
+                g2.setColor(Color.RED);
+            }
+
+            g2.setFont(new Font("Arial", Font.BOLD, 40));
+            fm = g2.getFontMetrics();
+            int titleWidth = fm.stringWidth(title);
+            g2.drawString(title, (WIDTH - titleWidth) / 2, HEIGHT / 2 - 20);
+
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.ITALIC, 20));
+            fm = g2.getFontMetrics();
+            int subtitleWidth = fm.stringWidth(subtitle);
+            g2.drawString(subtitle, (WIDTH - subtitleWidth) / 2, HEIGHT / 2 + 30);
+        }
+    }
+
+    private void loseLife() {
+        lives --;
+        if (lives <=0) {
+            timer.stop();
+            currentState = GameState.GAME_OVER;
+        } else {
+            paddle = new Paddle(300, 450, 120, 18); // Reset vị trí paddle về giữa
+            Ball newBall = new Ball(paddle.getX() + paddle.getWidth() / 2 - 10, paddle.getY() - 20, 20);
+            balls.add(newBall);
         }
     }
 
@@ -227,13 +295,22 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             }
             break;
             case MULTIBALL:
-            Ball ball2 = balls.get(0);
-            Ball newBall = new Ball(ball2.getX(), ball2.getY(), ball2.getWidth());
-            newBall.launch();
-            newBall.setdx(-ball2.getdx());
-            newBall.setdy(-ball2.getdy());
-            balls.add(newBall);
-            break;
+                if (balls.isEmpty()) break;
+
+                Ball ball2 = balls.get(0);
+                Ball newBall = new Ball(ball2.getX(), ball2.getY(), ball2.getWidth());
+                newBall.launch();
+                
+                //sửa lỗi ăn powerup khi bóng vẫn đang trên paddle
+                if (ball2.isLaunched()) {
+                    newBall.setdx(-ball2.getdx());
+                    newBall.setdy(-ball2.getdy());
+                } else {
+                    ball2.launch();
+                    newBall.setdx(-newBall.getdx());
+                }
+                balls.add(newBall);
+                break;
             case LASER:
                 break;
             case SHIELD:
@@ -241,6 +318,11 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             case STICKYPADDLE:
                 break;
             case LIFELOSS:
+                lives --;
+                if(lives <= 0) {
+                    timer.stop();
+                    currentState = GameState.GAME_OVER;
+                }
                 break;
         }
     }
@@ -262,8 +344,33 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         if(e.getKeyCode() == KeyEvent.VK_N) {
             bricks.clear();
         }
+
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (currentState == GameState.GAME_OVER || currentState == GameState.GAME_WIN) {
+                lives = 3;
+                score = new Point();
+
+                if (currentState == GameState.GAME_OVER) {
+                    loadLevel(GameManager.getCurrentLevel());
+                }
+                balls.clear();
+                balls.add(new Ball(350, 250, 20));
+                paddle = new Paddle(300, 450, 120, 18);
+
+                currentState = GameState.PLAYING;
+                timer.start();
+            } else if (currentState == GameState.LEVEL_CLEAR) {
+               
+                balls.clear();
+                balls.add(new Ball(350, 250, 20));
+                paddle = new Paddle(300, 450, 120, 18);
+                
+                currentState = GameState.PLAYING;
+                timer.start();
+            }
         repaint();
     }
+}
 
     @Override 
     public void keyReleased(KeyEvent e) {
