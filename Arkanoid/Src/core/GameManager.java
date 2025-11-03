@@ -28,6 +28,10 @@ public class GameManager {
         return null; // Không còn level nào
     }
 
+    public static int getCurrentLevelNumber() {
+        return currentLevelIndex + 1;
+    }
+
     public static void reset() {
         currentLevelIndex = 0;
     }
