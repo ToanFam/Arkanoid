@@ -17,7 +17,7 @@ public class Ball extends MovableObject {
     private BufferedImage sprite;
     private boolean Launched = false;
     private final int borderX = 20;
-    private final int borderY = 205;
+    private final int borderY = 195;
 
     public boolean isLaunched() {
         return Launched;

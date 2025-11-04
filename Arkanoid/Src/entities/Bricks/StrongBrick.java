@@ -11,6 +11,8 @@ public class StrongBrick extends Brick {
 
     @Override
     public void render(Graphics2D g2) {
+        g2.setColor(Color.BLACK);
+        g2.fillRect((int) x, (int) y, (int) (width), (int) (height));
         if (getHitPoints() == 1) {
             g2.setColor(BrickType.NORMAL.getColor());
         } else {

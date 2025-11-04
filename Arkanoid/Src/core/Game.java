@@ -23,7 +23,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     private enum GameState { MENU, PLAYING, PAUSED, LEVEL_CLEAR, GAME_WIN, GAME_OVER }
 
     private final int WIDTH = 830;
-    private final int HEIGHT = 950;
+    private final int HEIGHT = 900;
 
     private final ArrayList<Ball> balls = new ArrayList<>();
     private double ballSpeedScale = 1.0;
@@ -50,7 +50,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
 
     // UI renderers
     private final MenuRenderer menu;
-    private final PauseOverlay pauseOverlay = new PauseOverlay(); // lớp của bạn
+    private final PauseOverlay pauseOverlay = new PauseOverlay();
 
     // ====== ÂM THANH ======
     private Clip bgmClip;
@@ -80,7 +80,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         // ---- tạo bóng & paddle ban đầu ----
         Ball ball = new Ball(269, 250, 20);
         balls.add(ball);
-        paddle = new Paddle(360, 890, 120, 18);
+        paddle = new Paddle(360, 850, 120, 18);
 
         currentLevel = new Level(GameManager.getCurrentLevel());
         currentLevelNumber = GameManager.getCurrentLevelNumber();
@@ -393,7 +393,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             currentState = GameState.GAME_OVER;
             stop(bgmClip);
         } else {
-            paddle = new Paddle(360, 890, 120, 18);
+            paddle = new Paddle(360, 850, 120, 18);
             Ball newBall = new Ball(
                     (int) (paddle.getX() + paddle.getWidth() / 2 - 10),
                     (int) (paddle.getY() - 20), 20);
@@ -440,15 +440,15 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 balls.add(nb);
                 break;
 
-            case LASER:
+            //case LASER:
                 // TODO: triển khai laser ở Paddle
-                break;
-            case SHIELD:
+            //    break;
+            //case SHIELD:
                 // TODO: thêm thanh chắn cuối màn
-                break;
-            case STICKYPADDLE:
+            //    break;
+            //case STICKYPADDLE:
                 // TODO: bật flag sticky trong Paddle
-                break;
+            //    break;
             case LIFELOSS:
                 lives--;
                 if (lives <= 0) {
@@ -517,7 +517,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                     }
                     balls.clear();
                     balls.add(new Ball(350, 250, 20));
-                    paddle = new Paddle(360, 890, 120, 18);
+                    paddle = new Paddle(360, 850, 120, 18);
 
                     currentState = GameState.PLAYING;
                     playLoop(bgmClip);
@@ -533,7 +533,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         loadLevel(current);
         balls.clear();
         balls.add(new Ball(350, 250, 20));
-        paddle = new Paddle(360, 890, 120, 18);
+        paddle = new Paddle(360, 850, 120, 18);
         currentState = GameState.PLAYING;
         playLoop(bgmClip);
     }
