@@ -49,8 +49,8 @@ public class Paddle extends MovableObject {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         Color baseColor = Color.BLUE;
         GradientPaint gp = new GradientPaint(
-                (int)x, (int)y, baseColor.brighter(),
-                (int)x, (int)(y + height), baseColor.darker()
+            (int)x, (int)y, baseColor.brighter(), 
+            (int)x, (int)(y + height), baseColor.darker()
         );
         g2d.setPaint(gp);
 
