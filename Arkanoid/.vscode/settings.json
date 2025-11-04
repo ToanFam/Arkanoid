@@ -1,8 +1,0 @@
-{
-  "java.project.referencedLibraries": [
-    "lib/**/*.jar",
-    "Arkanoid/lib/jackson-annotations-2.19.2.jar",
-    "Arkanoid/lib/jackson-core-2.19.2.jar",
-    "Arkanoid/lib/jackson-databind-2.19.2.jar"
-  ]
-}

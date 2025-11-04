@@ -1,6 +1,5 @@
 package Arkanoid.Src.entities;
 import java.awt.*;
-import java.awt.geom.*;
 import Arkanoid.Src.entities.Bricks.*;
 
 public class Ball extends MovableObject {
@@ -9,12 +8,12 @@ public class Ball extends MovableObject {
 
     public boolean isLaunched() {
         return Launched;
-    }   
+    }
 
     public void launch() {
         if(!Launched) {
-            dx = 3.5;
-            dy = -3.5;
+            dx = 6.5;
+            dy = -6.5;
             Launched = true;
         }
     }
@@ -29,8 +28,8 @@ public class Ball extends MovableObject {
 
     public Ball(double x, double y, int size) {
         super(x, y, size, size);
-        this.dx = 3.5;
-        this.dy = -3.5;
+        this.dx = 6.5;
+        this.dy = -6.5;
         this.radius = (double) size / 2;
     }
     public void move(int screenWidth, int screenHeight) {
@@ -57,43 +56,36 @@ public class Ball extends MovableObject {
         dy = -dy;
     }
 
-    // lấy tọa độ điểm thuộc Rect gần Ball nhất
-    private double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
-    }
-
-    public boolean checkCollision(Brick brick) {
-        double closestX = clamp(x, brick.x, brick.x + brick.width);
-        double closestY = clamp(y, brick.y, brick.y + brick.height);
-        double dx = x - closestX;
-        double dy = y - closestY;
-        return (dx * dx + dy * dy) < (radius * radius);
-    }
-
     public void handleCollision(Brick brick) {
-        if (!checkCollision(brick)) return;
+        Rectangle ballBounds = this.getBounds();
+        Rectangle brickBounds = brick.getBounds();
 
-        double closestX = clamp(x, brick.x, brick.x + brick.width);
-        double closestY = clamp(y, brick.y, brick.y + brick.height);
-
-        double nx = x - closestX;
-        double ny = y - closestY;
-        double length = Math.sqrt(nx * nx + ny * ny);
-        if (length == 0) return;
-
-        // Phản chiếu vector vận tốc
-        nx /= length;
-        ny /= length;
-
-        double dot = dx * nx + dy * ny;
-        dx = dx - 2 * dot * nx;
-        dy = dy - 2 * dot * ny;
+        if (!ballBounds.intersects(brickBounds)) {
+            return;
+        }
 
         brick.takeHit();
 
-        // Đẩy ra ngoài
-        x = closestX + nx * (radius + 1);
-        y = closestY + ny * (radius + 1);
+        Rectangle intersection = ballBounds.intersection(brickBounds);
+
+        if (intersection.width < intersection.height) {
+            this.dx = -this.dx;
+
+            if (this.x < brickBounds.getCenterX()) {
+                this.x -= intersection.width;
+            } else {
+                this.x += intersection.width;
+            }
+
+        } else {
+            this.dy = -this.dy;
+
+            if(this.y < brickBounds.getCenterY()) {
+                this.y -= intersection.height;
+            } else {
+                this.y += intersection.height;
+            }
+        }
     }
 
     public void setX(double x) {
@@ -140,8 +132,43 @@ public class Ball extends MovableObject {
         this.dy = dy;
     }
 
+    @Override
+    public Rectangle getBounds() {
+        return new Rectangle((int)(x - radius), (int)(y - radius), width, height);
+    }
+
+    public void bounceOnPaddle (Paddle paddle) {
+        // đặt lại ngay trên paddle
+        this.setY(paddle.getY() - this.getRadius() - 1);
+
+        double paddleCenter = paddle.getX() + (double)paddle.getWidth() / 2; //tâm paddle
+        double dist = this.x - paddleCenter; // tâm quả bóng đến tâm paddle
+
+        //chuẩn hóa khoảng cách
+        double normDist = dist / ((double)paddle.getWidth() / 2);
+
+        //vân tốc mới phụ thuộc vào khoảng cách giữa 2 tâm
+        double maxDx = 6.5;
+        this.dx = normDist * maxDx;
+        this.dy = -Math.abs(this.dy); // bóng bật lên
+
+        // tránh bóng bay quá chậm
+        if (Math.abs(this.dy) < 3) {
+            this.dy = -3;
+        }
+    }
+
     public void render(Graphics g) {
-        g.setColor(Color.RED);
-        g.fillOval((int) (x - radius), (int) (y - radius), width, height);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Color baseColor = Color.RED;
+        GradientPaint gp = new GradientPaint(
+                (float)(x - radius), (float)(y - radius), baseColor.darker().darker(),
+                (float)(x + radius), (float)(y + radius), baseColor.brighter().brighter()
+        );
+        g2d.setPaint(gp);
+        g2d.fillOval((int)(x - radius), (int)(y - radius), width, height);
+        g2d.setColor(Color.WHITE);
+        g2d.fillOval((int)(x - radius*0.5), (int)(y - radius * 0.7), (int)(width * 0.4), (int)(height * 0.4));
     }
 }

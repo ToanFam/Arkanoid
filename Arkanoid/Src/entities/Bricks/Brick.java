@@ -34,7 +34,9 @@ public abstract class Brick extends GameObject {
     }
 
     private void playHitSound() {
-        GameManager.playSound(type.soundPath);
+        new Thread(() -> {
+            GameManager.playSound(type.soundPath);
+    }   ).start();
     }
 
     public boolean isDestroyed() {
