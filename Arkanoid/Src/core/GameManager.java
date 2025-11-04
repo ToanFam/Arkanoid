@@ -11,14 +11,14 @@ public class GameManager {
 
     static {
         // Danh sách file JSON level
-        /*levelFiles.add("Arkanoid/Src/assets/levels/level1.json");
+        levelFiles.add("Arkanoid/Src/assets/levels/level1.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level2.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level3.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level4.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level5.json");
-        levelFiles.add("Arkanoid/Src/assets/levels/level6.json");*/
+        levelFiles.add("Arkanoid/Src/assets/levels/level6.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level7.json");
-        /*levelFiles.add("Arkanoid/Src/assets/levels/level8.json");
+        levelFiles.add("Arkanoid/Src/assets/levels/level8.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level9.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level10.json");
         /*levelFiles.add("Arkanoid/Src/assets/levels/level11.json");

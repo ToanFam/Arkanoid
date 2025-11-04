@@ -1,45 +1,55 @@
-package Arkanoid.Src.ImageManager; // Dựa trên package trong import của bạn
+package Arkanoid.Src.ImageManager;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL; // Cần import URL
+import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ImageManager {
-    private static Map<String, BufferedImage> images = new HashMap<>();
+    private static final Map<String, BufferedImage> CACHE = new HashMap<>();
 
+    /**
+     * Load an image by classpath or filesystem path. Caches results.
+     * Examples:
+     *  - "assets/img/actors/ball.png" (classpath resource within your jar/classes)
+     *  - "/absolute/path/to/ball.png" (filesystem path)
+     */
     public static BufferedImage loadImage(String path) {
-        // Nếu đã tải ảnh này rồi, trả về từ cache
-        if (images.containsKey(path)) {
-            return images.get(path);
-        }
-        
-        BufferedImage image = null;
-        try {
-            // 1. Lấy URL (đường dẫn) của tài nguyên
-            URL imageUrl = ImageManager.class.getResource(path);
-            
-            // 2. KIỂM TRA NULL (Quan trọng nhất)
-            if (imageUrl == null) {
-                // Nếu không tìm thấy file, báo lỗi rõ ràng thay vì crash
-                System.err.println("LỖI NGHIÊM TRỌNG: Không thể tìm thấy ảnh tại: " + path);
-                System.err.println("Hãy kiểm tra lại đường dẫn (có dấu / ở đầu chưa?) và cấu trúc thư mục.");
-                return null; // Trả về null một cách an toàn
+        if (path == null || path.isEmpty()) return null;
+        if (CACHE.containsKey(path)) return CACHE.get(path);
+
+        BufferedImage img = null;
+        // Try classpath first
+        try (InputStream is = ImageManager.class.getClassLoader().getResourceAsStream(path)) {
+            if (is != null) {
+                img = ImageIO.read(is);
             }
+        } catch (IOException ignored) { }
 
-            // 3. Nếu không null, mới tiến hành đọc ảnh
-            image = ImageIO.read(imageUrl);
-            images.put(path, image); // Lưu vào cache
-
-        } catch (IOException e) { // Lỗi khi đọc file (file hỏng, không phải file ảnh,...)
-            System.err.println("Lỗi I/O khi đọc ảnh: " + path);
-            e.printStackTrace();
-        } catch (Exception e) { // Bắt các lỗi chung khác
-            System.err.println("Lỗi không xác định khi tải ảnh: " + path);
-            e.printStackTrace();
+        // Fallback to file path
+        if (img == null) {
+            try {
+                img = ImageIO.read(new java.io.File(path));
+            } catch (IOException ignored) {}
         }
-        return image;
+
+        if (img != null) { CACHE.put(path, img); }
+        return img;
+    }
+
+    // Convenience keys
+    public static BufferedImage ball() {
+        return loadImage("assets/img/actors/ball.png");
+    }
+
+    public static BufferedImage paddle() {
+        return loadImage("assets/img/actors/paddle.png");
+    }
+
+    public static BufferedImage menuBackground() {
+        return loadImage("assets/img/ui/menu_bg.png");
     }
 }

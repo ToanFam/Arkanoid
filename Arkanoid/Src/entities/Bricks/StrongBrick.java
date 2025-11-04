@@ -1,5 +1,7 @@
 package Arkanoid.Src.entities.Bricks;
 
+import Arkanoid.Src.core.GameManager;
+
 import java.awt.*;
 
 public class StrongBrick extends Brick {
@@ -9,14 +11,32 @@ public class StrongBrick extends Brick {
 
     @Override
     public void render(Graphics2D g2) {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         if (getHitPoints() == 1) {
-            g2.setColor(BrickType.NORMAL.color);
+            brickImage = BrickType.NORMAL.getImage();
         } else {
-            g2.setColor(getType().color);
+            brickImage = type.getImage();
         }
-        g2.fillRect((int)x, (int)y, (int)(width - 0.09 * width), (int)(height - 0.09 * width));
-        g2.setColor(Color.WHITE);
-        g2.drawRect((int) x, (int) y,
-                (int) width, (int) height);
+
+        if (brickImage != null) {
+            g2.drawImage(brickImage, (int) x, (int) y, null);
+        } else {
+            if (getHitPoints() == 1) {
+                g2.setColor(BrickType.NORMAL.getColor());
+            } else {
+                g2.setColor(getType().getColor());
+            }
+            g2.fillRect((int) x, (int) y, (int) (width - 0.09 * width), (int) (height - 0.09 * width));
+            g2.setColor(Color.WHITE);
+            g2.drawRect((int) x, (int) y,
+                    (int) width, (int) height);
+        }
+    }
+
+    @Override
+    public void takeHit() {
+        super.takeHit();
+        GameManager.playSound(BrickType.NORMAL.soundPath);
     }
 }

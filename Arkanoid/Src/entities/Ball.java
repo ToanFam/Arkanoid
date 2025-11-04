@@ -1,9 +1,20 @@
 package Arkanoid.Src.entities;
+import java.awt.image.BufferedImage;
+import Arkanoid.Src.ImageManager.ImageManager;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+
+import Arkanoid.Src.core.Game;
 import Arkanoid.Src.entities.Bricks.*;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+
+
 public class Ball extends MovableObject {
-    private double radius;
+    private int radius;
+    private BufferedImage sprite;
     private boolean Launched = false;
 
     public boolean isLaunched() {
@@ -11,9 +22,9 @@ public class Ball extends MovableObject {
     }
 
     public void launch() {
-        if(!Launched) {
-            dx = 6.5;
-            dy = -6.5;
+        if (!Launched) {
+            dx = 3.5;
+            dy = -3.5;
             Launched = true;
         }
     }
@@ -28,26 +39,27 @@ public class Ball extends MovableObject {
 
     public Ball(double x, double y, int size) {
         super(x, y, size, size);
-        this.dx = 6.5;
-        this.dy = -6.5;
-        this.radius = (double) size / 2;
+        this.dx = 3.5;
+        this.dy = -3.5;
+        this.radius = (int) size / 2;
     }
+
     public void move(int screenWidth, int screenHeight) {
         x += dx;
         y += dy;
 
         // Va chạm với tường
-        if (x - radius <= 0) {
+        if (x - radius <= 15) {
             dx *= -1;
-            x = radius + 1;
+            x = 15 + radius + 1;
         }
-        if (x + radius >= screenWidth) {
+        if (x + radius >= screenWidth - 15) {
             dx *= -1;
-            x = screenWidth - radius - 1;
+            x = screenWidth - 20 - radius - 1;
         }
-        if (y - radius <= 0) {
+        if (y - radius <= 150) {
             dy *= -1;
-            y = radius + 1;
+            y = 150 + radius + 1;
         }
 
     }
@@ -80,7 +92,7 @@ public class Ball extends MovableObject {
         } else {
             this.dy = -this.dy;
 
-            if(this.y < brickBounds.getCenterY()) {
+            if (this.y < brickBounds.getCenterY()) {
                 this.y -= intersection.height;
             } else {
                 this.y += intersection.height;
@@ -134,41 +146,63 @@ public class Ball extends MovableObject {
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle((int)(x - radius), (int)(y - radius), width, height);
+        return new Rectangle((int) (x - radius), (int) (y - radius), width, height);
     }
 
-    public void bounceOnPaddle (Paddle paddle) {
+    public void bounceOnPaddle(Paddle paddle) {
         // đặt lại ngay trên paddle
         this.setY(paddle.getY() - this.getRadius() - 1);
 
-        double paddleCenter = paddle.getX() + (double)paddle.getWidth() / 2; //tâm paddle
+        double paddleCenter = paddle.getX() + (double) paddle.getWidth() / 2; //tâm paddle
         double dist = this.x - paddleCenter; // tâm quả bóng đến tâm paddle
 
         //chuẩn hóa khoảng cách
-        double normDist = dist / ((double)paddle.getWidth() / 2);
+        double normDist = dist / ((double) paddle.getWidth() / 2);
 
         //vân tốc mới phụ thuộc vào khoảng cách giữa 2 tâm
-        double maxDx = 6.5;
+        double maxDx = 3.0;
         this.dx = normDist * maxDx;
         this.dy = -Math.abs(this.dy); // bóng bật lên
 
         // tránh bóng bay quá chậm
         if (Math.abs(this.dy) < 3) {
             this.dy = -3;
-        } 
+        }
     }
 
     public void render(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        Color baseColor = Color.RED;
-        GradientPaint gp = new GradientPaint(
-            (float)(x - radius), (float)(y - radius), baseColor.darker().darker(),
-            (float)(x + radius), (float)(y + radius), baseColor.brighter().brighter()
-        );
-        g2d.setPaint(gp);
-        g2d.fillOval((int)(x - radius), (int)(y - radius), width, height);
-        g2d.setColor(Color.WHITE);
-        g2d.fillOval((int)(x - radius*0.5), (int)(y - radius * 0.7), (int)(width * 0.4), (int)(height * 0.4));
+        try {
+            sprite = ImageIO.read(new File("Arkanoid/Src/assets/img/actors/ball.png"));
+            sprite = scale(sprite, radius * 2, radius * 2);
+            if (sprite != null) {
+                int drawX = (int) Math.round(x - sprite.getWidth() / 2.0);
+                int drawY = (int) Math.round(y - sprite.getHeight() / 2.0);
+                // Draw the image at coordinates (0, 0)
+                g.drawImage(sprite, drawX, drawY, null);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle the error, e.g., set a default background color
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            Color baseColor = Color.RED;
+            GradientPaint gp = new GradientPaint(
+                    (float) (x - radius), (float) (y - radius), baseColor.darker().darker(),
+                    (float) (x + radius), (float) (y + radius), baseColor.brighter().brighter()
+            );
+            g2d.setPaint(gp);
+            g2d.fillOval((int) (x - radius), (int) (y - radius), width, height);
+            g2d.setColor(Color.WHITE);
+            g2d.fillOval((int) (x - radius * 0.5), (int) (y - radius * 0.7), (int) (width * 0.4), (int) (height * 0.4));
+        }
+    }
+
+    private BufferedImage scale(BufferedImage src, int w, int h) {
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TRANSLUCENT);
+        Graphics2D g2 = out.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.drawImage(src, 0, 0, w, h, null);
+        g2.dispose();
+        return out;
     }
 }

@@ -41,11 +41,17 @@ public class ExplosiveBrick extends Brick {
         }
 
         if (isDestroyed()) return;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g2.setColor(getType().color);
-        g2.fillRect((int)x, (int)y, (int)(width - 0.09 * width), (int)(height - 0.09 * width));
-        g2.setColor(Color.WHITE);
-        g2.drawRect((int)x, (int)y, (int)width, (int)height);
+        brickImage = type.getImage();
+        if (brickImage != null) {
+            g2.drawImage(brickImage, (int) x, (int) y, null);
+        } else {
+            g2.setColor(getType().getColor());
+            g2.fillRect((int) x, (int) y, (int) (width - 0.09 * width), (int) (height - 0.09 * width));
+            g2.setColor(Color.WHITE);
+            g2.drawRect((int) x, (int) y, (int) width, (int) height);
+        }
     }
 
     @Override
