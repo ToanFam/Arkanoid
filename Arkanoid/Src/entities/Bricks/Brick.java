@@ -11,10 +11,9 @@ public abstract class Brick extends GameObject {
     private int hitPoints;
     protected BrickType type;
     private boolean status = false;
-    protected BufferedImage brickImage;
 
     public Brick(double x, double y, int width, int height, int hitPoints, BrickType type) {
-        super(x, y, 43, 21);
+        super(x, y, width, height);
         this.hitPoints = hitPoints;
         this.type = type;
     }
@@ -49,18 +48,10 @@ public abstract class Brick extends GameObject {
     public double getCenterY() { return y + height / 2; }
 
     public void render(Graphics2D g2) {
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        brickImage = type.getImage();
-
-        if (brickImage != null) {
-            g2.drawImage(brickImage, (int) x, (int) y, null);
-        } else {
-            g2.setColor(getType().getColor());
-            g2.fillRect((int) x, (int) y, (int) (width - 0.09 * width), (int) (height - 0.09 * width));
-            g2.setColor(Color.WHITE);
-            g2.drawRect((int) x, (int) y, (int) width, (int) height);
-        }
+        g2.setColor(getType().getColor());
+        g2.fillRect((int) x, (int) y, (int) (width - 0.09 * width), (int) (height - 0.09 * width));
+        g2.setColor(Color.WHITE);
+        g2.drawRect((int) x, (int) y, (int) width, (int) height);
     }
 
     public void onDestroyed(ArrayList<Brick> allBricks, Point score) {}

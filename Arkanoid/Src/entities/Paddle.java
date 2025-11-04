@@ -10,9 +10,10 @@ import java.io.IOException;
 public class Paddle extends MovableObject {
     private BufferedImage sprite;
     public int speed = 15;
+    private final int borderX = 25;
 
     public Paddle(double x, double y, int width, int height) {
-        super(x, y, 120, 15);
+        super(x, y, 120, 18);
         loadSprite();
     }
     public void loadSprite() {
@@ -40,10 +41,10 @@ public class Paddle extends MovableObject {
     }
 
     public void update(int screenWidth) {
-        if (x < 15) {
-            x = 15;
-        } else if (x + width > screenWidth + 5) {
-            x = screenWidth + 5 - width;
+        if (x < borderX) {
+            x = borderX;
+        } else if (x + width > screenWidth - 5) {
+            x = screenWidth - 5 - width;
         }
     }
 

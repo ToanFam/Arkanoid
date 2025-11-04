@@ -23,9 +23,9 @@ public class Level {
             this.ballSpeed = data.ballSpeed;
             this.paddleWidth = data.paddleWidth;
 
-            int brickWidth = 43;
-            int brickHeight = 21;
-            int startX = 18 + 15, startY = 170;
+            int brickWidth = data.brickWidth;
+            int brickHeight = data.brickHeight;
+            int startX = 24, startY = 208;
 
             for (int row = 0; row < data.rows; row++) {
                 String line = data.layout[row];

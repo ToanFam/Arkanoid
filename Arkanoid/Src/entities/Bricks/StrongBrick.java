@@ -11,27 +11,15 @@ public class StrongBrick extends Brick {
 
     @Override
     public void render(Graphics2D g2) {
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
         if (getHitPoints() == 1) {
-            brickImage = BrickType.NORMAL.getImage();
+            g2.setColor(BrickType.NORMAL.getColor());
         } else {
-            brickImage = type.getImage();
+            g2.setColor(getType().getColor());
         }
-
-        if (brickImage != null) {
-            g2.drawImage(brickImage, (int) x, (int) y, null);
-        } else {
-            if (getHitPoints() == 1) {
-                g2.setColor(BrickType.NORMAL.getColor());
-            } else {
-                g2.setColor(getType().getColor());
-            }
-            g2.fillRect((int) x, (int) y, (int) (width - 0.09 * width), (int) (height - 0.09 * width));
-            g2.setColor(Color.WHITE);
-            g2.drawRect((int) x, (int) y,
-                    (int) width, (int) height);
-        }
+        g2.fillRect((int) x, (int) y, (int) (width - 0.09 * width), (int) (height - 0.09 * width));
+        g2.setColor(Color.WHITE);
+        g2.drawRect((int) x, (int) y,
+                (int) width, (int) height);
     }
 
     @Override

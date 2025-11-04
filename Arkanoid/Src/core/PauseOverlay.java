@@ -17,21 +17,21 @@ public class PauseOverlay {
         g.fillRect(0, 0, w, h);
 
         // tiêu đề
-        g.setColor(Color.WHITE);
-        g.setFont(g.getFont().deriveFont(Font.BOLD, 48f));
-        String title = "PAUSED";
-        int tw = g.getFontMetrics().stringWidth(title);
-        g.drawString(title, (w - tw)/2, h/3);
+        //g.setColor(Color.WHITE);
+        //g.setFont(g.getFont().deriveFont(Font.BOLD, 48f));
+        //String title = "PAUSED";
+        //int tw = g.getFontMetrics().stringWidth(title);
+        //g.drawString(title, (w - tw)/2, h/3);
 
         // menu
-        g.setFont(g.getFont().deriveFont(Font.PLAIN, 24f));
-        for (int i = 0; i < items.length; i++) {
-            String t = (i == selected) ? "▶ " + items[i] + " ◀" : items[i];
-            int iw = g.getFontMetrics().stringWidth(t);
-            int x = (w - iw)/2;
-            int y = h/2 + i*40;
-            g.setColor(i == selected ? Color.YELLOW : Color.LIGHT_GRAY);
-            g.drawString(t, x, y);
-        }
+        //g.setFont(g.getFont().deriveFont(Font.PLAIN, 24f));
+        //for (int i = 0; i < items.length; i++) {
+        //    String t = (i == selected) ? "▶ " + items[i] + " ◀" : items[i];
+        //    int iw = g.getFontMetrics().stringWidth(t);
+        //    int x = (w - iw)/2;
+        //    int y = h/2 + i*40;
+        //    g.setColor(i == selected ? Color.YELLOW : Color.LIGHT_GRAY);
+        //    g.drawString(t, x, y);
+        //}
     }
 }

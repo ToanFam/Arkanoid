@@ -16,6 +16,8 @@ public class Ball extends MovableObject {
     private int radius;
     private BufferedImage sprite;
     private boolean Launched = false;
+    private final int borderX = 20;
+    private final int borderY = 205;
 
     public boolean isLaunched() {
         return Launched;
@@ -49,17 +51,17 @@ public class Ball extends MovableObject {
         y += dy;
 
         // Va chạm với tường
-        if (x - radius <= 15) {
+        if (x - radius <= borderX) {
             dx *= -1;
-            x = 15 + radius + 1;
+            x = borderX + radius + 1;
         }
-        if (x + radius >= screenWidth - 15) {
+        if (x + radius >= screenWidth - borderX) {
             dx *= -1;
-            x = screenWidth - 20 - radius - 1;
+            x = screenWidth - borderX - radius - 1;
         }
-        if (y - radius <= 150) {
+        if (y - radius <= borderY) {
             dy *= -1;
-            y = 150 + radius + 1;
+            y = borderY + radius + 1;
         }
 
     }

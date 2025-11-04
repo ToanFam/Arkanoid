@@ -21,7 +21,7 @@ public class GameManager {
         levelFiles.add("Arkanoid/Src/assets/levels/level8.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level9.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level10.json");
-        /*levelFiles.add("Arkanoid/Src/assets/levels/level11.json");
+        levelFiles.add("Arkanoid/Src/assets/levels/level11.json");
         /*levelFiles.add("Arkanoid/Src/assets/levels/level12.json");
         /*levelFiles.add("Arkanoid/Src/assets/levels/level13.json");
         /*levelFiles.add("Arkanoid/Src/assets/levels/level14.json");

@@ -22,8 +22,8 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     // ====== STATE & CẤU HÌNH CƠ BẢN ======
     private enum GameState { MENU, PLAYING, PAUSED, LEVEL_CLEAR, GAME_WIN, GAME_OVER }
 
-    private final int WIDTH = 538;
-    private final int HEIGHT = 720;
+    private final int WIDTH = 830;
+    private final int HEIGHT = 950;
 
     private final ArrayList<Ball> balls = new ArrayList<>();
     private double ballSpeedScale = 1.0;
@@ -80,7 +80,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         // ---- tạo bóng & paddle ban đầu ----
         Ball ball = new Ball(269, 250, 20);
         balls.add(ball);
-        paddle = new Paddle(230, 680, 120, 18);
+        paddle = new Paddle(360, 890, 120, 18);
 
         currentLevel = new Level(GameManager.getCurrentLevel());
         currentLevelNumber = GameManager.getCurrentLevelNumber();
@@ -319,14 +319,14 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 String levelText = "Level: " + currentLevelNumber;
                 FontMetrics fm = g2.getFontMetrics();
                 int textWidth = fm.stringWidth(levelText);
-                g2.drawString(levelText, (WIDTH - textWidth) / 2, 120);
+                g2.drawString(levelText, (WIDTH - textWidth) / 2, 160);
 
                 // OVERLAY CHO LEVEL/GAME OVER/WIN
                 if (currentState == GameState.LEVEL_CLEAR
                         || currentState == GameState.GAME_WIN
                         || currentState == GameState.GAME_OVER) {
 
-                    g2.setColor(new Color(0, 0, 0, 150));
+                    g2.setColor(new Color(0, 0, 0, 168));
                     g2.fillRect(0, 0, WIDTH, HEIGHT);
 
                     String title = "";
@@ -393,7 +393,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             currentState = GameState.GAME_OVER;
             stop(bgmClip);
         } else {
-            paddle = new Paddle(230, 680, 120, 18);
+            paddle = new Paddle(360, 890, 120, 18);
             Ball newBall = new Ball(
                     (int) (paddle.getX() + paddle.getWidth() / 2 - 10),
                     (int) (paddle.getY() - 20), 20);
@@ -517,7 +517,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                     }
                     balls.clear();
                     balls.add(new Ball(350, 250, 20));
-                    paddle = new Paddle(230, 680, 120, 18);
+                    paddle = new Paddle(360, 890, 120, 18);
 
                     currentState = GameState.PLAYING;
                     playLoop(bgmClip);
@@ -533,7 +533,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         loadLevel(current);
         balls.clear();
         balls.add(new Ball(350, 250, 20));
-        paddle = new Paddle(230, 680, 120, 18);
+        paddle = new Paddle(360, 890, 120, 18);
         currentState = GameState.PLAYING;
         playLoop(bgmClip);
     }
