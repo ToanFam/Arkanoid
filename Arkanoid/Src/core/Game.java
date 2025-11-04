@@ -6,11 +6,14 @@ import Arkanoid.Src.entities.Bricks.*;
 import Arkanoid.Src.powerups.PowerUp;
 import Arkanoid.Src.entities.Paddle;
 import Arkanoid.Src.powerups.PowerUpType;
+import Arkanoid.Src.ImageManager.ImageManager;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.awt.event.*;
 
 public class Game extends JPanel implements KeyListener, ActionListener, ComponentListener {
 
@@ -28,8 +31,10 @@ public class Game extends JPanel implements KeyListener, ActionListener, Compone
     private ArrayList<PowerUp> powerUps = new ArrayList<>();
     private int lives;
 
-    private enum GameState { PLAYING, LEVEL_CLEAR, GAME_WIN, GAME_OVER }
+    private enum GameState { PLAYING, PAUSED, LEVEL_CLEAR, GAME_WIN, GAME_OVER }
     private GameState currentState;
+
+    private BufferedImage bgimg;
     
     boolean leftPressed = false;
     boolean rightPressed = false;
@@ -39,10 +44,15 @@ public class Game extends JPanel implements KeyListener, ActionListener, Compone
  
     public Game() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+        String imgpath ="/Arkanoid/Src/assets/img/other/bg.png";
+        this.bgimg = ImageManager.loadImage(imgpath);
+        
         setBackground(Color.BLACK);
 
         lives = 3;
         currentState = GameState.PLAYING;
+
 
         //load hình ảnh cho power-up để không bi lag khi lần đầu xuất hiện
         PowerUpType.preloadImages();
@@ -66,7 +76,10 @@ public class Game extends JPanel implements KeyListener, ActionListener, Compone
         removeKeyListener(this);
         addKeyListener(this);
         requestFocusInWindow();
-        timer.start();
+
+        if(currentState == GameState.PLAYING) {
+            timer.start();
+        }
     }
 
     public void componentHidden(ComponentEvent e) {
@@ -194,6 +207,10 @@ public class Game extends JPanel implements KeyListener, ActionListener, Compone
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
+        if (this.bgimg != null) {
+            g2.drawImage(this.bgimg, 0, 0, getWidth(), getHeight(), this);
+        }
+
         // vẽ paddle và ball
         for (Ball ball : balls) {
             ball.render(g2);
@@ -220,6 +237,41 @@ public class Game extends JPanel implements KeyListener, ActionListener, Compone
         // Hiển thị điểm
         score.render(g2);
 
+        if(currentState != GameState.PLAYING && currentState != null) {
+            g2.setColor(new Color(0, 0, 0, 150));
+            g2.fillRect(0, 0, WIDTH, HEIGHT);
+
+            String title = "";
+            String subtitle = "Press ENTER to continue"; // Mặc định
+            FontMetrics fm; // Khai báo ở đây
+
+            if (currentState == GameState.LEVEL_CLEAR) {
+                title = "LEVEL COMPLETE!";
+                g2.setColor(Color.GREEN);
+            } else if (currentState == GameState.GAME_WIN) {
+                title = "YOU WIN!";
+                g2.setColor(Color.YELLOW);
+            } else if (currentState == GameState.GAME_OVER) {
+                title = "GAME OVER";
+                g2.setColor(Color.RED);
+            } else if (currentState == GameState.PAUSED) { 
+                title = "PAUSED";
+                subtitle = "Press P to resume"; 
+                g2.setColor(Color.CYAN); 
+            }
+
+            g2.setFont(new Font("Arial", Font.BOLD, 40));
+            fm = g2.getFontMetrics();
+            int titleWidth = fm.stringWidth(title);
+            g2.drawString(title, (WIDTH - titleWidth) / 2, HEIGHT / 2 - 20);
+
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.ITALIC, 20));
+            fm = g2.getFontMetrics();
+            int subtitleWidth = fm.stringWidth(subtitle);
+            g2.drawString(subtitle, (WIDTH - subtitleWidth) / 2, HEIGHT / 2 + 30);
+        }
+
         //hiển thị số mạng người chơi
         g2.setFont(new Font("Arial", Font.BOLD, 20));
         g2.setColor(Color.RED);
@@ -235,7 +287,6 @@ public class Game extends JPanel implements KeyListener, ActionListener, Compone
             FontMetrics fm = g2.getFontMetrics();
             int textWidth = fm.stringWidth(message);
 
-            // căn giữa theo chiều ngang, đặt ở 1/3 chiều cao màn hình
             int x = (WIDTH - textWidth) / 2;
             int y = (int)paddle.getY() + 45;
 
@@ -344,11 +395,24 @@ public class Game extends JPanel implements KeyListener, ActionListener, Compone
     
 
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            leftPressed = true;
-        } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-           rightPressed = true;
+        if(currentState == GameState.PLAYING) {
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                leftPressed = true;
+            } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            rightPressed = true;
+            }
         }
+
+        if(e.getKeyCode() == KeyEvent.VK_P) {
+            if (currentState == GameState.PLAYING) {
+                currentState = GameState.PAUSED;
+                timer.stop(); 
+                repaint(); 
+            } else if (currentState == GameState.PAUSED) {
+                currentState = GameState.PLAYING;
+                timer.start(); 
+        }
+    }
 
         if(e.getKeyCode() == KeyEvent.VK_SPACE) {
             for (Ball ball : balls) {
@@ -382,9 +446,8 @@ public class Game extends JPanel implements KeyListener, ActionListener, Compone
                 currentState = GameState.PLAYING;
                 timer.start();
             }
-        repaint();
+        }
     }
-}
 
     @Override 
     public void keyReleased(KeyEvent e) {
