@@ -11,9 +11,26 @@ public class GameManager {
 
     static {
         // Danh sách file JSON level
-        levelFiles.add("Arkanoid/Src/assets/levels/level1.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level1.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level2.json");
         levelFiles.add("Arkanoid/Src/assets/levels/level3.json");
+        levelFiles.add("Arkanoid/Src/assets/levels/level4.json");
+        levelFiles.add("Arkanoid/Src/assets/levels/level5.json");
+        levelFiles.add("Arkanoid/Src/assets/levels/level6.json");*/
+        levelFiles.add("Arkanoid/Src/assets/levels/level7.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level8.json");
+        levelFiles.add("Arkanoid/Src/assets/levels/level9.json");
+        levelFiles.add("Arkanoid/Src/assets/levels/level10.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level11.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level12.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level13.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level14.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level15.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level16.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level17.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level18.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level19.json");
+        /*levelFiles.add("Arkanoid/Src/assets/levels/level20.json");*/
     }
 
     public static String getCurrentLevel() {

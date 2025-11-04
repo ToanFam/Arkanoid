@@ -12,8 +12,8 @@ public class Ball extends MovableObject {
 
     public void launch() {
         if(!Launched) {
-            dx = 3.5;
-            dy = -3.5;
+            dx = 6.5;
+            dy = -6.5;
             Launched = true;
         }
     }
@@ -28,8 +28,8 @@ public class Ball extends MovableObject {
 
     public Ball(double x, double y, int size) {
         super(x, y, size, size);
-        this.dx = 3.5;
-        this.dy = -3.5;
+        this.dx = 6.5;
+        this.dy = -6.5;
         this.radius = (double) size / 2;
     }
     public void move(int screenWidth, int screenHeight) {
@@ -148,7 +148,7 @@ public class Ball extends MovableObject {
         double normDist = dist / ((double)paddle.getWidth() / 2);
 
         //vân tốc mới phụ thuộc vào khoảng cách giữa 2 tâm
-        double maxDx = 3.0;
+        double maxDx = 6.5;
         this.dx = normDist * maxDx;
         this.dy = -Math.abs(this.dy); // bóng bật lên
 

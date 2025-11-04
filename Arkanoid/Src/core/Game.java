@@ -36,8 +36,8 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     boolean leftPressed = false;
     boolean rightPressed = false;
 
-    final int WIDTH = 680;
-    final int HEIGHT = 500;
+    final int WIDTH = 800;
+    final int HEIGHT = 800;
  
     public Game() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -52,7 +52,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         // tạo bóng và paddle`
         Ball ball = new Ball(350, 250, 20);
         balls.add(ball);
-        paddle = new Paddle(300, 450, 120, 18);
+        paddle = new Paddle(400, 750, 120, 18);
 
         currentLevel = new Level(GameManager.getCurrentLevel());
         currentLevelNumber = GameManager.getCurrentLevelNumber();
@@ -276,7 +276,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             timer.stop();
             currentState = GameState.GAME_OVER;
         } else {
-            paddle = new Paddle(300, 450, 120, 18); // Reset vị trí paddle về giữa
+            paddle = new Paddle(400, 750, 120, 18); // Reset vị trí paddle về giữa
             Ball newBall = new Ball(paddle.getX() + paddle.getWidth() / 2 - 10, paddle.getY() - 20, 20);
             balls.add(newBall);
         }
@@ -355,7 +355,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 }
                 balls.clear();
                 balls.add(new Ball(350, 250, 20));
-                paddle = new Paddle(300, 450, 120, 18);
+                paddle = new Paddle(400, 750, 120, 18);
 
                 currentState = GameState.PLAYING;
                 timer.start();
@@ -363,7 +363,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                
                 balls.clear();
                 balls.add(new Ball(350, 250, 20));
-                paddle = new Paddle(300, 450, 120, 18);
+                paddle = new Paddle(400, 750, 120, 18);
                 
                 currentState = GameState.PLAYING;
                 timer.start();

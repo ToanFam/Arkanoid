@@ -23,8 +23,8 @@ public class Level {
             this.ballSpeed = data.ballSpeed;
             this.paddleWidth = data.paddleWidth;
 
-            int brickWidth = 55;
-            int brickHeight = 25;
+            int brickWidth = data.brickWidth;
+            int brickHeight = data.brickHeight;
             int startX = 10, startY = 50;
 
             for (int row = 0; row < data.rows; row++) {
