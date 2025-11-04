@@ -1,0 +1,11 @@
+# Bỏ qua file biên dịch Java
+*.class
+
+# Bỏ qua thư mục build/output nếu có
+/bin/
+/out/
+/target/
+
+# Bỏ qua file hệ thống IDE
+.idea/
+*.iml

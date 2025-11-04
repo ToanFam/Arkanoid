@@ -9,17 +9,17 @@ public class Paddle extends MovableObject {
     }
 
     public void moveLeft() {
-            x -= speed;
-        }
+        x -= speed;
+    }
 
     public void moveRight() {
-            x += speed;
+        x += speed;
     }
 
     public void update(int screenWidth) {
         if (x < 0) {
             x = 0;
-        } else if (x + width > screenWidth) { 
+        } else if (x + width > screenWidth) {
             x = screenWidth - width;
         }
     }

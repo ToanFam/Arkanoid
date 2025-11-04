@@ -108,7 +108,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                         continue;
                     }
                 }
-        
+
                 if(ball.getBounds().intersects(paddle.getBounds())) {
                     ball.bounceOnPaddle(paddle);
                 }
@@ -152,14 +152,24 @@ public class Game extends JPanel implements KeyListener, ActionListener {
             loseLife();
         }
 
-        if (leftPressed) {
-            paddle.moveLeft();
-            paddle.update(WIDTH);
-        }
+            if (leftPressed) {
+                paddle.moveLeft();
+                paddle.update(WIDTH);
+            }
 
-        if (rightPressed) {
-            paddle.moveRight();
-            paddle.update(WIDTH);
+            if (rightPressed) {
+                paddle.moveRight();
+                paddle.update(WIDTH);
+            }
+
+            levelCleared = true;
+            for (Brick brick : bricks) {
+                if (!brick.isDestroyed() && !(brick instanceof UnbreakableBrick)) {
+                    levelCleared = false;
+                }
+            }
+
+            checkLevelComplete();
         }
 
         levelCleared = true;
@@ -189,7 +199,7 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         for( PowerUp p : powerUps) {
             p.render(g2);
         }
-        
+
         // vẽ gạch
         for (Brick brick : bricks) {
             if (brick.isDestroyed() && brick instanceof ExplosiveBrick) {
@@ -214,18 +224,18 @@ public class Game extends JPanel implements KeyListener, ActionListener {
         //Vẽ chữ nhấn SPACE để bắt đầu game
         for (Ball ball : balls) {
             if (!ball.isLaunched()) {
-            g2.setFont(new Font("Arial", Font.ITALIC, 24));
-            g2.setColor(Color.orange);
+                g2.setFont(new Font("Arial", Font.ITALIC, 24));
+                g2.setColor(Color.orange);
 
-            String message = "Press SPACE to start game";
-            FontMetrics fm = g2.getFontMetrics();
-            int textWidth = fm.stringWidth(message);
+                String message = "Press SPACE to start game";
+                FontMetrics fm = g2.getFontMetrics();
+                int textWidth = fm.stringWidth(message);
 
             // căn giữa theo chiều ngang, đặt ở 1/3 chiều cao màn hình
             int x = (WIDTH - textWidth) / 2;
             int y = (int)paddle.getY() + 45;
 
-            g2.drawString(message, x, y);
+                g2.drawString(message, x, y);
             }
         }
 
@@ -288,12 +298,12 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 paddle.setWidth(paddle.getWidth() + 40);
                 break;
             case SLOWBALL:
-            for (Ball ball : balls) {
-                ball.setdx(ball.getdx() * 0.5);
-                ball.setdy(ball.getdy() * 0.5);
+                for (Ball ball : balls) {
+                    ball.setdx(ball.getdx() * 0.5);
+                    ball.setdy(ball.getdy() * 0.5);
+                    break;
+                }
                 break;
-            }
-            break;
             case MULTIBALL:
                 if (balls.isEmpty()) break;
 
@@ -326,19 +336,19 @@ public class Game extends JPanel implements KeyListener, ActionListener {
                 break;
         }
     }
-    
-    
+
+
 
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             leftPressed = true;
         } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-           rightPressed = true;
+            rightPressed = true;
         }
 
         if(e.getKeyCode() == KeyEvent.VK_SPACE) {
             for (Ball ball : balls) {
-            ball.launch();
+                ball.launch();
             }
         }
         if(e.getKeyCode() == KeyEvent.VK_N) {
@@ -372,15 +382,15 @@ public class Game extends JPanel implements KeyListener, ActionListener {
     }
 }
 
-    @Override 
+    @Override
     public void keyReleased(KeyEvent e) {
-    if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-        leftPressed = false;
-    } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-        rightPressed = false;
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            leftPressed = false;
+        } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            rightPressed = false;
+        }
     }
-}
-    @Override 
+    @Override
     public void keyTyped(KeyEvent e) { }
 
     public static void main(String[] args) {

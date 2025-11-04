@@ -8,7 +8,7 @@ public class Ball extends MovableObject {
 
     public boolean isLaunched() {
         return Launched;
-    }   
+    }
 
     public void launch() {
         if(!Launched) {
@@ -165,6 +165,20 @@ public class Ball extends MovableObject {
         GradientPaint gp = new GradientPaint(
             (float)(x - radius), (float)(y - radius), baseColor.darker().darker(),
             (float)(x + radius), (float)(y + radius), baseColor.brighter().brighter()
+        );
+        g2d.setPaint(gp);
+        g2d.fillOval((int)(x - radius), (int)(y - radius), width, height);
+        g2d.setColor(Color.WHITE);
+        g2d.fillOval((int)(x - radius*0.5), (int)(y - radius * 0.7), (int)(width * 0.4), (int)(height * 0.4));
+    }
+
+    public void render(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Color baseColor = Color.RED;
+        GradientPaint gp = new GradientPaint(
+                (float)(x - radius), (float)(y - radius), baseColor.darker().darker(),
+                (float)(x + radius), (float)(y + radius), baseColor.brighter().brighter()
         );
         g2d.setPaint(gp);
         g2d.fillOval((int)(x - radius), (int)(y - radius), width, height);
